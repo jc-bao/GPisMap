@@ -26,31 +26,38 @@ mexGPisMap3('reset')
 
 % The original dataset downloadable at http://rll.berkeley.edu/bigbird/
 % The following data are sampled and prepared by the authors for the test
-depthpath = '../data/3D/bigbird_detergent/masked_depth';
-poses = single(load('../data/3D/bigbird_detergent/pose/poses.txt'));
+% depthpath = '../data/3D/bigbird_detergent/masked_depth';
+% poses = single(load('../data/3D/bigbird_detergent/pose/poses.txt'));
 
 % input sequence
-FrameNums = [93:3:359 3:3:90];  % numel : 120
-CamIDs = repmat([1 2 3 4 3 2],1,30);
+% FrameNums = [93:3:359 3:3:90];  % numel : 120
+% CamIDs = repmat([1 2 3 4 3 2],1,30);
 
 % test 3D volume grid
-[xg, yg, zg ] = meshgrid(-0.07:0.01:0.13, -0.1:0.01:0.14, 0:0.01:0.28);
+[xg, yg, zg ] = meshgrid(-0.04:0.005:0.04, -0.04:0.005:0.04, -0.04:0.005:0.04);
 xtest1 = single([xg(:)'; yg(:)'; zg(:)']);
 
+load('../data/3D/carved_cube/data.mat')
+
+n = size(depth, 1);
+
 count = 0;
-for k=1:3:numel(FrameNums)
-    frmNo = FrameNums(k);
-    count = count + 1;
-    camID = CamIDs(count);
+for k=1:n
+%     frmNo = FrameNums(k);
+%     count = count + 1;
+    camID = 0;
 
-    D = imread(fullfile(depthpath,sprintf('frame%d_cam%d.png',frmNo,camID)));
-    D = single(D)*single(0.0001); % 10 mm to meter
+%     D = imread(fullfile(depthpath,sprintf('frame%d_cam%d.png',frmNo,camID)));
+%     D = single(D)*single(0.0001); % 10 mm to meter
+    D = squeeze(depth(k,:,:));
 
-    T = reshape(poses(count,:),4,4);
+%     T = reshape(poses(count,:),4,4);
+    T = squeeze(pose(k,:,:));
+
     R = T(1:3,1:3);
     t = T(4,1:3)';
 
-    mexGPisMap3('setCamera',camID,'bigbird'); % See mex/mexGPisMap3.cpp for camera calibration info
+    mexGPisMap3('setCamera',camID,'cube'); % See mex/mexGPisMap3.cpp for camera calibration info
     mexGPisMap3('update',D,[t' reshape(R,1,[])]);
 
     close all;

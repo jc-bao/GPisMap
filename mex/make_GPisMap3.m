@@ -1,4 +1,4 @@
-EIGEN_PATH = '/usr/include/eigen3';
+EIGEN_PATH = '/usr/local/include/eigen3/';
 SRC = '../cpp/src';
 INC = '../cpp/include';
 
