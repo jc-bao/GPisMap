@@ -1,24 +1,10 @@
 /*
- * GPisMap - Online Continuous Mapping using Gaussian Process Implicit Surfaces
- * https://github.com/leebhoram/GPisMap
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License v3 as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of any FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU General Public License v3 for more details.
- *
- * You should have received a copy of the GNU General Public License v3
- * along with this program; if not, you can access it online at
- * http://www.gnu.org/licenses/gpl-3.0.html.
- *
- * Authors: Bhoram Lee <bhoram.lee@gmail.com>
- *          Huang Zonghao<ac@hzh.io>
+Q: how to define a mex function?
+A: 
  */
 
 #include "mex.h"
+
 #include <vector>
 #include <memory>
 #include <iostream>
@@ -48,7 +34,7 @@ static const int cubeCam_height = 64;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-
+  mexPrintf("hello.......");
   char command[128];
   mxGetString(prhs[0], command, 128);
   std::string commstr(command);
@@ -69,6 +55,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           mxSINGLE_CLASS != mxGetClassID(prhs[2]))
       {
         std::cout << "The input data must be float (single) type.  @ train()" << std::endl;
+        mexPrintf("The input data must be float (single) type.  @ train()");
         return;
       }
 
@@ -82,6 +69,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     else
       std::cout << "Error: Check the input dimension." << std::endl;
+      mexPrintf("Error: Check the input dimension.");
     return;
   }
   else if (commstr.compare("test") == 0)
@@ -96,6 +84,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxSINGLE_CLASS != mxGetClassID(prhs[1]))
     {
       std::cout << "The input data must be float (single) type. @ test()" << std::endl;
+      mexPrintf("The input data must be float (single) type. @ test()");
       return;
     }
 
@@ -118,6 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else if (gpm == 0)
     {
       std::cout << "Error: the map is not initialized." << std::endl;
+      mexPrintf("Error: the map is not initialized.");
     }
   }
   else if (commstr.compare("setCamera") == 0)
@@ -194,8 +184,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       gpm->reset();
       delete gpm;
       gpm = 0;
-      std::cout << "Map cleared\n"
-                << std::endl;
+      std::cout << "Map cleared\n" << std::endl;
+      mexPrintf("Map cleared\n");
     }
     return;
   }

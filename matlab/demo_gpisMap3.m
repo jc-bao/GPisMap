@@ -34,7 +34,7 @@ mexGPisMap3('reset')
 % CamIDs = repmat([1 2 3 4 3 2],1,30);
 
 % test 3D volume grid
-[xg, yg, zg ] = meshgrid(-0.04:0.005:0.04, -0.04:0.005:0.04, -0.04:0.005:0.04);
+[xg, yg, zg ] = meshgrid(-0.04:0.02:0.04, -0.04:0.02:0.04, -0.04:0.02:0.04);
 xtest1 = single([xg(:)'; yg(:)'; zg(:)']);
 
 load('../data/3D/carved_cube/data.mat')
