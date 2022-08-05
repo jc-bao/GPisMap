@@ -49,10 +49,10 @@ for k=1:n
 
 %     D = imread(fullfile(depthpath,sprintf('frame%d_cam%d.png',frmNo,camID)));
 %     D = single(D)*single(0.0001); % 10 mm to meter
-    D = squeeze(depth(k,:,:));
+    D = single(squeeze(depth(k,:,:)));
 
 %     T = reshape(poses(count,:),4,4);
-    T = squeeze(pose(k,:,:));
+    T = single(squeeze(pose(k,:,:)));
 
     R = T(1:3,1:3);
     t = T(4,1:3)';
