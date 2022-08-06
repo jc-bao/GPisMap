@@ -4,11 +4,15 @@ A:
  */
 
 #include "mex.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <fstream>
 
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <chrono>
+#include <string.h>
 #include "GPisMap3.h"
 
 static GPisMap3 *gpm = 0;
@@ -34,7 +38,6 @@ static const int cubeCam_height = 64;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  mexPrintf("hello.......");
   char command[128];
   mxGetString(prhs[0], command, 128);
   std::string commstr(command);
@@ -49,13 +52,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mwSize numDim = mxGetNumberOfDimensions(prhs[1]);
     const mwSize *dims = mxGetDimensions(prhs[1]);
 
-    if (numDim == 2 && (nrhs == 3))
+    char dim_str[7];
+    std::sprintf(dim_str, "%d", numDim);
+    char nrhs_str[7];
+    std::sprintf(nrhs_str, "%d", nrhs);
+    strcat(dim_str,nrhs_str);
+
+    if ((int(numDim) == 2) && (nrhs == 3))
     {
       if (mxSINGLE_CLASS != mxGetClassID(prhs[1]) ||
           mxSINGLE_CLASS != mxGetClassID(prhs[2]))
       {
         std::cout << "The input data must be float (single) type.  @ train()" << std::endl;
-        mexPrintf("The input data must be float (single) type.  @ train()");
         return;
       }
 
@@ -67,24 +75,31 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       int numel = mxGetNumberOfElements(prhs[1]);
       gpm->update(pz, numel, pose);
     }
-    else
+    else {
       std::cout << "Error: Check the input dimension." << std::endl;
-      mexPrintf("Error: Check the input dimension.");
+    }
     return;
   }
   else if (commstr.compare("test") == 0)
   {
+    std::ofstream out("test.txt");
+    std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
+    std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
+    std::cout << "out buf test" << std::endl;
+
     const mwSize *dims = mxGetDimensions(prhs[1]);
     int dim = dims[0];
     int N = dims[1];
+    std::cout << dim << "," << N << std::endl;
 
     if (dim != 3)
+    {
       return;
+    }
 
     if (mxSINGLE_CLASS != mxGetClassID(prhs[1]))
     {
       std::cout << "The input data must be float (single) type. @ test()" << std::endl;
-      mexPrintf("The input data must be float (single) type. @ test()");
       return;
     }
 
@@ -94,7 +109,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
       if (sizeof(float) == sizeof(double))
       {
-        plhs[0] = mxCreateDoubleMatrix(2 * (1 + dim), N, mxREAL); // f-value[0],  grad-value[1,2], variances[3-5]
+        plhs[0] = mxCreateDoubleMatrix(2 * (1 + dim), N, mxREAL); // f-vale[0],  grad-value[1,2], variances[3-5]
       }
       else if (sizeof(float) == sizeof(float))
       {
@@ -107,7 +122,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else if (gpm == 0)
     {
       std::cout << "Error: the map is not initialized." << std::endl;
-      mexPrintf("Error: the map is not initialized.");
     }
   }
   else if (commstr.compare("setCamera") == 0)
@@ -185,7 +199,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       delete gpm;
       gpm = 0;
       std::cout << "Map cleared\n" << std::endl;
-      mexPrintf("Map cleared\n");
     }
     return;
   }

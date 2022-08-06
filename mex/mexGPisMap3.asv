@@ -1,28 +1,15 @@
 /*
- * GPisMap - Online Continuous Mapping using Gaussian Process Implicit Surfaces
- * https://github.com/leebhoram/GPisMap
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License v3 as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of any FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU General Public License v3 for more details.
- *
- * You should have received a copy of the GNU General Public License v3
- * along with this program; if not, you can access it online at
- * http://www.gnu.org/licenses/gpl-3.0.html.
- *
- * Authors: Bhoram Lee <bhoram.lee@gmail.com>
- *          Huang Zonghao<ac@hzh.io>
+Q: how to define a mex function?
+A: 
  */
 
 #include "mex.h"
+
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <chrono>
+#include <string.h>
 #include "GPisMap3.h"
 
 static GPisMap3 *gpm = 0;
@@ -48,7 +35,7 @@ static const int cubeCam_height = 64;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-
+  mexPrintf("function called!\n");
   char command[128];
   mxGetString(prhs[0], command, 128);
   std::string commstr(command);
@@ -63,12 +50,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mwSize numDim = mxGetNumberOfDimensions(prhs[1]);
     const mwSize *dims = mxGetDimensions(prhs[1]);
 
+    char dim_str[7];
+    std::sprintf(dim_str, "%d", numDim);
+    char nrhs_str[7];
+    std::sprintf(nrhs_str, "%d", nrhs);
+    strcat(dim_str,nrhs_str);
+    strcat("input dim", dim_str);
+
+    mexPrintf(dim_str);
     if (numDim == 2 && (nrhs == 3))
     {
       if (mxSINGLE_CLASS != mxGetClassID(prhs[1]) ||
           mxSINGLE_CLASS != mxGetClassID(prhs[2]))
       {
         std::cout << "The input data must be float (single) type.  @ train()" << std::endl;
+        mexPrintf("The input data must be float (single) type.  @ train()");
         return;
       }
 
@@ -82,6 +78,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     else
       std::cout << "Error: Check the input dimension." << std::endl;
+      mexPrintf("Error: Check the input dimension.");
     return;
   }
   else if (commstr.compare("test") == 0)
@@ -96,6 +93,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxSINGLE_CLASS != mxGetClassID(prhs[1]))
     {
       std::cout << "The input data must be float (single) type. @ test()" << std::endl;
+      mexPrintf("The input data must be float (single) type. @ test()");
       return;
     }
 
@@ -118,6 +116,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else if (gpm == 0)
     {
       std::cout << "Error: the map is not initialized." << std::endl;
+      mexPrintf("Error: the map is not initialized.");
     }
   }
   else if (commstr.compare("setCamera") == 0)
@@ -163,9 +162,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         camParam c(YCBCams_fx[n], YCBCams_fy[n], YCBCams_cx[n], YCBCams_cy[n], YCBCams_width, YCBCams_height);
         gpm = new GPisMap3(p, c);
       }
-      else if (camnamestr.compare("ycb") == 0)
+      else if (camnamestr.compare("cube") == 0)
       {
-        camParam c(YCBCams_fx[n], YCBCams_fy[n], YCBCams_cx[n], YCBCams_cy[n], YCBCams_width, YCBCams_height);
+        camParam c(cubeCam_fx, cubeCam_fy, cubeCam_cx, cubeCam_cy, cubeCam_width, cubeCam_height);
         gpm = new GPisMap3(p, c);
       }
     }
@@ -194,8 +193,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       gpm->reset();
       delete gpm;
       gpm = 0;
-      std::cout << "Map cleared\n"
-                << std::endl;
+      std::cout << "Map cleared\n" << std::endl;
+      mexPrintf("Map cleared\n");
     }
     return;
   }

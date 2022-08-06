@@ -40,11 +40,13 @@ xtest1 = single([xg(:)'; yg(:)'; zg(:)']);
 load('../data/3D/carved_cube/data.mat')
 
 n = size(depth, 1);
+% n = numel(FrameNums);
 
 count = 0;
 for k=1:n
 %     frmNo = FrameNums(k);
 %     count = count + 1;
+%     camID = CamIDs(count);
     camID = 0;
 
 %     D = imread(fullfile(depthpath,sprintf('frame%d_cam%d.png',frmNo,camID)));
@@ -58,10 +60,11 @@ for k=1:n
     t = T(4,1:3)';
 
     mexGPisMap3('setCamera',camID,'cube'); % See mex/mexGPisMap3.cpp for camera calibration info
+%     mexGPisMap3('setCamera',camID,'bigbird');
     mexGPisMap3('update',D,[t' reshape(R,1,[])]);
 
     close all;
-    if  1 % k == k_last
+    if 1 % k == n
        visualize_gpisMap3
     end
 
